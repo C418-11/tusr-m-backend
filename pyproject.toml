@@ -1,0 +1,5 @@
+[tool.mypy]
+files = ["app"]
+strict = true
+pretty = true
+allow_redefinition = true
