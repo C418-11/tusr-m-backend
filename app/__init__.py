@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-from typing import cast
-
 from flask import Flask
 from flask_cors import CORS
 
@@ -10,11 +8,8 @@ from . import api
 from .config import Config
 from .extensions import db
 from .extensions import jwt
-from .models.auth import Permission
-from .models.auth import Role
-from .models.auth import User
-from .permission import PERMISSIONS
 from .routes import auth
+from .routes import data
 
 
 def create_app() -> Flask:
@@ -37,54 +32,39 @@ def create_app() -> Flask:
 
     api.initialize_hooks(app)
     auth.initialize_hooks(app)
+    data.initialize_hooks(app)
 
-    app.register_blueprint(auth.bp, url_prefix="/auth")
+    app.register_blueprint(auth.bp, url_prefix="/api/auth")
+    app.register_blueprint(data.bp, url_prefix="/api/data")
 
     # 添加初始化命令
     @app.cli.command("init")
     def init() -> None:
         """初始化应用程序"""
-        init_auth()
+
+        print("正在初始化应用程序")
+        for setup in [
+            create_all_with_progress,
+            auth.initialize_setup,
+            data.initialize_setup,
+        ]:
+            print()
+            setup()
+        print()
+        print("应用程序初始化完成")
 
     return app
 
 
-def init_auth() -> None:
-    db.create_all()
-    print("数据库表已创建")
+def create_all_with_progress() -> None:
+    print("正在创建数据库")
+    print()
 
-    # 创建权限
-    for name, desc in {
-        PERMISSIONS.ACCOUNT.CREATE: "创建账户",
-        PERMISSIONS.ACCOUNT.GET: "获取账户",
-        PERMISSIONS.ACCOUNT.DELETE: "删除账户",
-        PERMISSIONS.ROLE.GET: "获取角色",
-        PERMISSIONS.ROLE.CREATE: "创建角色",
-        PERMISSIONS.ROLE.DELETE: "删除角色",
-        PERMISSIONS.PERMISSION.GET: "获取权限",
-    }.items():
-        print(f"创建权限：{name}")
-        # noinspection SpellCheckingInspection
-        db.session.add(Permission(name=name, description=desc))
-    db.session.commit()
+    for key in db.metadatas:
+        metadata, engine = db.metadatas[key], db.engines[key]
+        for table in metadata.sorted_tables:
+            print(f"正在创建表： {table.name}")
+            table.create(bind=engine, checkfirst=True)
 
-    # 创建角色
-    for name, (desc, permissions) in {
-        "admin": ("管理员", [
-            PERMISSIONS.ACCOUNT.GET,
-            PERMISSIONS.ACCOUNT.CREATE,
-            PERMISSIONS.ACCOUNT.DELETE,
-            PERMISSIONS.ROLE.GET,
-            PERMISSIONS.ROLE.CREATE,
-            PERMISSIONS.ROLE.DELETE,
-            PERMISSIONS.PERMISSION.GET,
-        ]),
-    }.items():
-        print(f"创建角色：{name}")
-        db.session.add(Role.create(name=name, description=desc, permissions=cast(list[str], permissions)))
-    db.session.commit()
-
-    # 创建用户
-    db.session.add(User.create(username="admin", password="admin", roles=["admin"]))
-    db.session.commit()
-    print("管理员用户已创建")
+    print()
+    print("数据库创建完成")

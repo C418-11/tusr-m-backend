@@ -1,3 +1,33 @@
+[tool.tox]
+envlist = ["flake8", "mypy"]
+no_package = true
+
+[tool.tox.env.flake8]
+deps = ["flake8"]
+commands = [
+    ["flake8",
+        "--doctests", "--max-line-length=120", "--max-complexity=10",
+        "--show-source", "--count", "--statistics",
+        "app"
+    ],
+]
+
+[tool.tox.env.mypy]
+deps = [
+    "mypy",
+
+    "types-Flask-Cors",
+
+    "flask_jwt_extended",
+    "flask_sqlalchemy",
+    "wrapt",
+    "redis",
+    "marshmallow",
+]
+commands = [
+    ["mypy"],
+]
+
 [tool.mypy]
 files = ["app"]
 strict = true

@@ -1,15 +1,61 @@
-# 1. åˆ›å»ºè™šæ‹Ÿç¯å¢ƒ
-python -m venv .venv
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+if (Test-Path .venv)
+{
+    Write-Host "'.venv' Ä¿Â¼ÒÑ´æÔÚ£¬Ìø¹ı»·¾³³õÊ¼»¯¡£"
 
-# 2. æ¿€æ´»è™šæ‹Ÿç¯å¢ƒ
-.\.venv\Scripts\Activate.ps1
-if (-not $?) { exit 1 }
+    # ¼¤»îĞéÄâ»·¾³
+    Write-Host "ÕıÔÚ¼¤»îĞéÄâ»·¾³..."
+    .\.venv\Scripts\Activate.ps1
+    if ($? -ne $true)
+    {
+        Write-Host "ĞéÄâ»·¾³¼¤»îÊ§°Ü¡£"
+        exit 1
+    }
+}
+else
+{
+    # ´´½¨ĞéÄâ»·¾³
+    Write-Host "ÕıÔÚ´´½¨ĞéÄâ»·¾³..."
+    python -m venv .venv
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Host "ĞéÄâ»·¾³´´½¨Ê§°Ü¡£"
+        exit $LASTEXITCODE
+    }
 
-# 3. å®‰è£…ä¾èµ–
-pip install --force-reinstall -r requirements.txt
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    # ¼¤»îĞéÄâ»·¾³
+    Write-Host "ÕıÔÚ¼¤»îĞéÄâ»·¾³..."
+    .\.venv\Scripts\Activate.ps1
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Host "ĞéÄâ»·¾³¼¤»îÊ§°Ü¡£"
+        exit $LASTEXITCODE
+    }
 
-# 4. åˆå§‹åŒ– Flask
-flask init
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    # °²×°ÒÀÀµ
+    Write-Host "ÕıÔÚ°²×°ÒÀÀµ..."
+    python.exe -m pip install --upgrade pip
+    pip install --force-reinstall -r requirements.txt
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Host "ÒÀÀµ°²×°Ê§°Ü¡£"
+        exit $LASTEXITCODE
+    }
+}
+
+if (Test-Path instance)
+{
+    Write-Host "'instance' Ä¿Â¼ÒÑ´æÔÚ£¬Ìø¹ı Flask ³õÊ¼»¯¡£"
+}
+else
+{
+    # ³õÊ¼»¯ Flask
+    Write-Host "ÕıÔÚ³õÊ¼»¯ Flask..."
+    flask init
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Host "Flask ³õÊ¼»¯Ê§°Ü¡£"
+        exit $LASTEXITCODE
+    }
+}
+
+Write-Host "ÏîÄ¿³õÊ¼»¯Íê³É¡£"

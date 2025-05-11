@@ -10,20 +10,26 @@ from typing import cast
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
+from ..model_utils import BoolCol
+from ..model_utils import DynamicMany2Many
+from ..model_utils import IdCol
+from ..model_utils import SecondaryTable
+from ..model_utils import Str128Col
+from ..model_utils import UniqueStr64Col
 from ..extensions import db
 
 # 用户-角色关联表（多对多）
-user_roles = db.Table(
+user_roles = SecondaryTable(
     "user_roles",
-    db.Column("user_id", db.Integer, db.ForeignKey("users.id")),
-    db.Column("role_id", db.Integer, db.ForeignKey("roles.id"))
+    user_id="users.id",
+    role_id="roles.id"
 )
 
 # 角色-权限关联表（多对多）
-role_permissions = db.Table(
+role_permissions = SecondaryTable(
     "role_permissions",
-    db.Column("role_id", db.Integer, db.ForeignKey("roles.id")),
-    db.Column("permission_id", db.Integer, db.ForeignKey("permissions.id"))
+    role_id="roles.id",
+    permission_id="permissions.id"
 )
 
 
@@ -33,15 +39,13 @@ class User(db.Model):  # type: ignore[misc, name-defined]
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "users"
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), unique=True, index=True)
-    password_hash = db.Column(db.String(128))
-    active = db.Column(db.Boolean, default=True)
+    id = IdCol()
+    username = UniqueStr64Col(index=True)
+    password_hash = Str128Col()
+    active = BoolCol(default=True)
 
     # 关联角色（多对多）
-    roles = db.relationship("Role",
-                            secondary=user_roles,
-                            backref=db.backref("users", lazy="dynamic"))
+    roles = DynamicMany2Many("Role", user_roles, "users")
 
     @classmethod
     def create(cls, username: str, password: str, roles: Optional[list[str]] = None, active: bool = True) -> Self:
@@ -83,7 +87,7 @@ class User(db.Model):  # type: ignore[misc, name-defined]
         :param password: 密码
         :type password: str
         """
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = generate_password_hash(password)  # type: ignore[assignment]
 
     def verify_password(self, password: str) -> bool:
         """
@@ -95,7 +99,7 @@ class User(db.Model):  # type: ignore[misc, name-defined]
         :return: 密码是否正确
         :rtype: bool
         """
-        return check_password_hash(self.password_hash, password)
+        return check_password_hash(self.password_hash, password)  # type: ignore[arg-type]
 
     def has_permission(self, permission_name: str) -> bool:
         """
@@ -117,14 +121,14 @@ class Role(db.Model):  # type: ignore[misc, name-defined]
     # noinspection SpellCheckingInspection
     __tablename__ = "roles"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    description = db.Column(db.String(256))
+    id = IdCol()
+    name = UniqueStr64Col()
+    description = Str128Col()
 
+    # 关联用户（多对多）
+    users = DynamicMany2Many("User", user_roles, "roles")
     # 关联权限（多对多）
-    permissions = db.relationship("Permission",
-                                  secondary=role_permissions,
-                                  backref=db.backref("roles", lazy="dynamic"))
+    permissions = DynamicMany2Many("Permission", role_permissions, "roles")
 
     @classmethod
     def create(cls, name: str, description: str, permissions: Optional[list[str]] = None) -> Self:
@@ -168,9 +172,12 @@ class Permission(db.Model):  # type: ignore[misc, name-defined]
     # noinspection SpellCheckingInspection
     __tablename__ = "permissions"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), unique=True)
-    description = db.Column(db.String(256))
+    id = IdCol()
+    name = UniqueStr64Col()
+    description = Str128Col()
+
+    # 关联角色（多对多）
+    roles = DynamicMany2Many("Role", role_permissions, "permissions")
 
 
 __all__ = (

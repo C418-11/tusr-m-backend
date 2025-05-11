@@ -21,21 +21,24 @@ class PERMISSIONS:
     class PERMISSION(StrEnum):
         GET = "auth/permissions/get"
 
-    class ACCOUNT(StrEnum):
-        CREATE = "auth/accounts/create"
-        GET = "auth/accounts/get"
-        DELETE = "auth/accounts/delete"
-
     class ROLE(StrEnum):
         CREATE = "auth/roles/create"
         GET = "auth/roles/get"
         DELETE = "auth/roles/delete"
 
+    class ACCOUNT(StrEnum):
+        CREATE = "auth/accounts/create"
+        GET = "auth/accounts/get"
+        DELETE = "auth/accounts/delete"
+        UPDATE = "auth/accounts/update"
+        UPDATE_SELF_PASSWORD = "auth/accounts/update/self_password"
+
 
 def verify_permissions_in_request(
         permission_names: Collection[str],
         *,
-        strategy: Callable[[Iterable[bool]], bool] = all,
+        strategy: Callable[[Iterable[Any]], bool],
+        check_active: bool = True,
 ) -> bool:
     """
     检查权限需求
@@ -43,7 +46,9 @@ def verify_permissions_in_request(
     :param permission_names: 权限名
     :type permission_names: list[str]
     :param strategy: 权限检查策略
-    :type strategy: Callable[[Iterable[bool]], bool]
+    :type strategy: Callable[[Iterable[Any]], bool]
+    :param check_active: 是否检查账户是否激活
+    :type check_active: bool
     """
 
     me: User | None = current_user
@@ -53,24 +58,30 @@ def verify_permissions_in_request(
         _requested_permissions = {name: False for name in permission_names}
         _passed_permissions = set()
         _missing_permissions = permission_names
+        _account_active = False
     else:
         _requested_permissions = {name: me.has_permission(name) for name in permission_names}
         _passed_permissions = set(filter(lambda name: _requested_permissions[name], permission_names))
         _missing_permissions = _requested_permissions.keys() - _passed_permissions
+        _account_active = me.active  # type: ignore[assignment]
 
     g._requested_permissions = _requested_permissions
     g._passed_permissions = list(_passed_permissions)
     g._missing_permissions = list(_missing_permissions)
+    g._account_active = _account_active
 
-    if me is None or (not strategy(_requested_permissions.values())):
-        return False
-    return True
+    return not any((
+            me is None,
+            check_active and not _account_active,
+            not strategy(_requested_permissions.values()),
+    ))
 
 
 def permissions_required[C: Callable[..., APIResult]](
         permission_names: Collection[str],
         *,
-        strategy: Callable[[Iterable[bool]], bool] = all,
+        strategy: Callable[[Iterable[Any]], bool] = all,
+        check_active: bool = True,
 ) -> Callable[[C], C]:
     """
     检查权限需求
@@ -78,14 +89,15 @@ def permissions_required[C: Callable[..., APIResult]](
     :param permission_names: 权限名
     :type permission_names: list[str]
     :param strategy: 权限检查策略
-    :type strategy: Callable[[Iterable[bool]], bool]
+    :type strategy: Callable[[Iterable[Any]], bool]
+    :param check_active: 是否检查账户是否激活
+    :type check_active: bool
     """
 
     def wrapper(func: C) -> C:
         @decorator  # type: ignore[misc]
         def inner(wrapped: C, _instance: Any, args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
-            nonlocal permission_names, strategy
-            if not verify_permissions_in_request(permission_names, strategy=strategy):
+            if not verify_permissions_in_request(permission_names, strategy=strategy, check_active=check_active):
                 return PermissionDenied(missing_permissions=get_missing_permissions())
 
             return wrapped(*args, **kwargs)
@@ -143,13 +155,38 @@ def get_passed_permissions() -> list[str]:
     return cast(list[str], permissions)
 
 
+def get_account_active() -> bool:
+    """
+    获取账户是否激活
+
+    :return: 账户是否激活
+    :rtype: bool
+    """
+
+    active = g.get("_account_active")
+    if active is None:
+        raise RuntimeError(CONTEXT_NOT_VALID_ERROR_MSG)
+    return cast(bool, active)
+
+
 requested_permissions = LocalProxy(get_requested_permissions)
 missing_permissions = LocalProxy(get_missing_permissions)
 passed_permissions = LocalProxy(get_passed_permissions)
+account_active = LocalProxy(get_account_active)
 
 __all__ = (
     "PERMISSIONS",
+
+    "verify_permissions_in_request",
     "permissions_required",
+
+    "get_requested_permissions",
+    "get_missing_permissions",
     "get_passed_permissions",
+    "get_account_active",
+
+    "requested_permissions",
+    "missing_permissions",
     "passed_permissions",
+    "account_active",
 )

@@ -144,7 +144,7 @@ class GetRoles(APIResult):
 
 @dataclass(kw_only=True)
 class GetPermissions(APIResult):
-    code: int = d(421)
+    code: int = d(521)
     message: str = d("Get Permissions Success")
     permissions: list[dict[str, Any]]
 
@@ -212,6 +212,13 @@ class AccountNotFound(APIResult):
 class WrongUsernameOrPassword(APIResult):
     code: int = d(422)
     message: str = d("Wrong Username or Password")
+
+
+@register
+@dataclass(kw_only=True)
+class DisabledAccount(APIResult):
+    code: int = d(423)
+    message: str = d("Disabled Account")
 
 
 class APIException(Exception):
@@ -282,6 +289,7 @@ __all__ = (
     "PermissionDenied",
     "AccountNotFound",
     "WrongUsernameOrPassword",
+    "DisabledAccount",
 
     "APIException",
 
