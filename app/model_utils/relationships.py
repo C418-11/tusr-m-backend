@@ -7,10 +7,10 @@ from typing import Any
 
 from flask_sqlalchemy.model import Model
 from sqlalchemy import Column
-from sqlalchemy import Integer
 from sqlalchemy import Table
 from sqlalchemy.orm import RelationshipProperty
 
+from .columns.other import ForeignKeyCol
 from ..extensions import db
 
 
@@ -50,7 +50,7 @@ class RelationshipWithFK:
     """
     关系属性
     """
-    foreign_key: Column[Integer]
+    foreign_key: Column[int]
     """
     外键列
     """
@@ -65,7 +65,7 @@ def BelongsTo(
         model: str | type[Model],
         back_populates: str,
         *,
-        foreign_key: str,
+        foreign_key: str = ".id",
         nullable: bool = False,
         **kwargs: Any,
 ) -> RelationshipWithFK:
@@ -83,7 +83,7 @@ def BelongsTo(
     :type model: str
     :param back_populates: 反向引用属性名
     :type back_populates: str
-    :param foreign_key: 外键路径字符串
+    :param foreign_key: 外键路径字符串，默认为 ``.id``
     :type foreign_key: str
     :param nullable: 外键是否允许为空
     :type nullable: bool
@@ -104,12 +104,41 @@ def BelongsTo(
         back_populates=back_populates,
         **kwargs
     )
-    foreign_key = db.Column(
-        db.Integer,
-        db.ForeignKey(foreign_key),
-        nullable=nullable,
-    )
+    foreign_key = ForeignKeyCol(foreign_key, nullable=nullable)
     return RelationshipWithFK(relationship, foreign_key)
+
+
+# noinspection PyPep8Naming
+def NullableBelongsTo(
+        model: str | type[Model],
+        back_populates: str,
+        *,
+        foreign_key: str = ".id",
+        **kwargs: Any,
+) -> RelationshipWithFK:
+    """
+    创建可空的多对一关系属性及外键列
+
+    用于“多对一”的“多”方，定义外键并关联到目标模型
+
+    .. note::
+       当传入的 ``model`` 参数为 ``type[Model]`` 时，传入的外键应省略表名
+       例如 ``foreign_key="tables.id"`` 应改为 ``foreign_key=".id"``
+       保留点符号以提高可读性
+
+    :param model: 关联的模型类名
+    :type model: str
+    :param back_populates: 反向引用属性名
+    :type back_populates: str
+    :param foreign_key: 外键路径字符串，默认为 ``.id``
+    :type foreign_key: str
+    :param kwargs: 其他relationship配置参数
+    :type kwargs: Any
+
+    :return: 包含关系属性和外键列的元组对象
+    :rtype: RelationshipWithFK
+    """
+    return BelongsTo(model, back_populates, foreign_key=foreign_key, nullable=True, **kwargs)
 
 
 # noinspection PyPep8Naming
@@ -140,5 +169,6 @@ def DynamicMany2Many(model: str | type[Model], secondary: Table, back_populates:
 __all__ = (
     "DynamicMany",
     "BelongsTo",
+    "NullableBelongsTo",
     "DynamicMany2Many",
 )

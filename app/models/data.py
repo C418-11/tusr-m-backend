@@ -3,14 +3,24 @@
 
 from ..extensions import db
 from ..model_utils import BelongsTo
+from ..model_utils import BoolCol
 from ..model_utils import DateCol
 from ..model_utils import DynamicMany
 from ..model_utils import IdCol
+from ..model_utils import IntCol
+from ..model_utils import NullableBelongsTo
 from ..model_utils import NullableBoolCol
+from ..model_utils import NullableDateCol
+from ..model_utils import NullableFloatCol
+from ..model_utils import NullableStr128Col
+from ..model_utils import NullableStr256Col
 from ..model_utils import NullableStr64Col
+from ..model_utils import Str128Col
+from ..model_utils import Str256Col
+from ..model_utils import Str32Col
 from ..model_utils import Str64Col
 from ..model_utils import UniqueStr64Col
-from ..model_utils import IntCol
+from ..model_utils import ForeignKeyCol
 
 
 class SchoolClass(db.Model):  # type: ignore[misc, name-defined]
@@ -48,8 +58,6 @@ class CertificateType(db.Model):  # type: ignore[misc, name-defined]
     id = IdCol()
     # 证件类型
     name = UniqueStr64Col()
-    # 学生
-    students = DynamicMany("Student", "certificate_type")
 
 
 class EthnicGroup(db.Model):  # type: ignore[misc, name-defined]
@@ -65,17 +73,17 @@ class EthnicGroup(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "ethnic_group")
 
 
-class EducationLevel(db.Model):  # type: ignore[misc, name-defined]
+class PreviousEducationLevel(db.Model):  # type: ignore[misc, name-defined]
     """
     以前学历
     """
     # noinspection SpellCheckingInspection
-    __tablename__ = "education_levels"
+    __tablename__ = "previous_education_levels"
     id = IdCol()
     # 学历
     name = UniqueStr64Col()
     # 学生
-    students = DynamicMany("Student", "education_level")
+    students = DynamicMany("Student", "previous_education_level")
 
 
 class StudentOrigin(db.Model):  # type: ignore[misc, name-defined]
@@ -175,7 +183,7 @@ class HouseholdCity(db.Model):  # type: ignore[misc, name-defined]
     # 学生
     students = DynamicMany("Student", "household_city")
     # 户籍所在地-省
-    household_province, household_province_id = BelongsTo(HouseholdProvince, "household_cities", foreign_key=".id")
+    household_province, household_province_id = BelongsTo(HouseholdProvince, "household_cities")
     # 户籍所在地-县
     household_counties = DynamicMany("HouseholdCounty", "household_city")
 
@@ -192,7 +200,7 @@ class HouseholdCounty(db.Model):  # type: ignore[misc, name-defined]
     # 学生
     students = DynamicMany("Student", "household_county")
     # 户籍所在地-市
-    household_city, household_city_id = BelongsTo(HouseholdCity, "household_counties", foreign_key=".id")
+    household_city, household_city_id = BelongsTo(HouseholdCity, "household_counties")
 
 
 class EnrollmentQuarter(db.Model):  # type: ignore[misc, name-defined]
@@ -247,17 +255,95 @@ class StudentStatus(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "student_status")
 
 
-class StudyType(db.Model):  # type: ignore[misc, name-defined]
+class StudyMode(db.Model):  # type: ignore[misc, name-defined]
     """
     学习形式
     """
     # noinspection SpellCheckingInspection
-    __tablename__ = "study_types"
+    __tablename__ = "study_modes"
     id = IdCol()
     # 学习形式
     name = UniqueStr64Col()
     # 学生
-    students = DynamicMany("Student", "study_type")
+    students = DynamicMany("Student", "study_mode")
+
+
+class OriginalRank(db.Model):  # type: ignore[misc, name-defined]
+    """
+    原军衔
+    """
+    # noinspection SpellCheckingInspection
+    __tablename__ = "original_ranks"
+    id = IdCol()
+    # 原军衔
+    name = UniqueStr64Col()
+    # 学生
+    students = DynamicMany("Student", "original_rank")
+
+
+class RetireType(db.Model):  # type: ignore[misc, name-defined]
+    """
+    退役方式
+    """
+    # noinspection SpellCheckingInspection
+    __tablename__ = "retire_types"
+    id = IdCol()
+    # 退役方式
+    name = UniqueStr64Col()
+    # 学生
+    students = DynamicMany("Student", "retire_type")
+
+
+class HealthStatus(db.Model):  # type: ignore[misc, name-defined]
+    """
+    健康状况
+    """
+    # noinspection SpellCheckingInspection
+    __tablename__ = "health_statuses"
+    id = IdCol()
+    # 健康状况
+    name = UniqueStr64Col()
+    # 学生
+    students = DynamicMany("Student", "health_status")
+
+
+class FinancialAidType(db.Model):  # type: ignore[misc, name-defined]
+    """
+    资助申请类型
+    """
+    # noinspection SpellCheckingInspection
+    __tablename__ = "financial_aid_types"
+    id = IdCol()
+    # 资助申请类型
+    name = UniqueStr64Col()
+    # 学生
+    students = DynamicMany("Student", "financial_aid_type")
+
+
+class Nationality(db.Model):  # type: ignore[misc, name-defined]
+    """
+    国籍
+    """
+    # noinspection SpellCheckingInspection
+    __tablename__ = "nationalities"
+    id = IdCol()
+    # 国籍
+    name = UniqueStr64Col()
+    # 学生
+    students = DynamicMany("Student", "nationality")
+
+
+class FamilyDifficultyType(db.Model):  # type: ignore[misc, name-defined]
+    """
+    家庭困难类型
+    """
+    # noinspection SpellCheckingInspection
+    __tablename__ = "family_difficulty_types"
+    id = IdCol()
+    # 家庭困难类型
+    name = UniqueStr64Col()
+    # 学生
+    students = DynamicMany("Student", "family_difficulty_type")
 
 
 class Student(db.Model):  # type: ignore[misc, name-defined]
@@ -271,21 +357,21 @@ class Student(db.Model):  # type: ignore[misc, name-defined]
     campus_name = Str64Col()
     # 班级
     # 第一个参数为模型时类，外键应为'.'开头的相对外键，省略表名
-    school_class, school_class_id = BelongsTo(SchoolClass, "students", foreign_key=".id")
+    school_class, school_class_id = BelongsTo(SchoolClass, "students")
     # 学号
     student_id = UniqueStr64Col()
     # 证件类型
-    certificate_type, certificate_type_id = BelongsTo(CertificateType, "students", foreign_key=".id")
+    certificate_type_id = ForeignKeyCol(CertificateType)
     # 证件号码 之所以不用Unique是因为我不确定证件类型不同的情况下证件号码会不会是全局唯一的
     certificate_number = Str64Col()
     # 姓名
-    name = Str64Col()
+    name = Str128Col()
     # 性别
-    gender, gender_id = BelongsTo(Gender, "students", foreign_key=".id")
+    gender, gender_id = BelongsTo(Gender, "students")
     # 出生日期 YYYY-MM-DD
     birthday = DateCol()
     # 民族
-    ethnic_group, ethnic_group_id = BelongsTo(EthnicGroup, "students", foreign_key=".id")
+    ethnic_group, ethnic_group_id = BelongsTo(EthnicGroup, "students")
     # 联系电话
     phone = Str64Col()
     # 开户银行名称
@@ -293,40 +379,137 @@ class Student(db.Model):  # type: ignore[misc, name-defined]
     # 银行卡号
     bank_account = NullableStr64Col()
     # 以前学历
-    education_level, education_level_id = BelongsTo(EducationLevel, "students", foreign_key=".id")
+    previous_education_level, previous_education_level_id = BelongsTo(PreviousEducationLevel, "students")
     # 生源地
-    student_origin, student_origin_id = BelongsTo(StudentOrigin, "students", foreign_key=".id")
+    student_origin, student_origin_id = BelongsTo(StudentOrigin, "students")
     # 学生类别
-    student_category, student_category_id = BelongsTo(StudentCategory, "students", foreign_key=".id")
+    student_category, student_category_id = BelongsTo(StudentCategory, "students")
     # 政治面貌
-    political_status, political_status_id = BelongsTo(PoliticalStatus, "students", foreign_key=".id")
+    political_status, political_status_id = BelongsTo(PoliticalStatus, "students")
     # 户口性质
-    household_type, household_type_id = BelongsTo(HouseholdType, "students", foreign_key=".id")
+    household_type, household_type_id = BelongsTo(HouseholdType, "students")
     # 户口区域
-    household_area, household_area_id = BelongsTo(HouseholdArea, "students", foreign_key=".id")
+    household_area, household_area_id = BelongsTo(HouseholdArea, "students")
     # 户籍所在地 保留，精确到户的完整地址
-    household_address = Str64Col()
+    household_address = Str256Col()
     # 户籍所在地-省
-    household_province, household_province_id = BelongsTo(HouseholdProvince, "students", foreign_key=".id")
+    household_province, household_province_id = BelongsTo(HouseholdProvince, "students")
     # 户籍所在地-市
-    household_city, household_city_id = BelongsTo(HouseholdCity, "students", foreign_key=".id")
+    household_city, household_city_id = BelongsTo(HouseholdCity, "students")
     # 户籍所在地-县
-    household_county, household_county_id = BelongsTo(HouseholdCounty, "students", foreign_key=".id")
+    household_county, household_county_id = BelongsTo(HouseholdCounty, "students")
     # 是否三侨生
     is_overseas_chinese = NullableBoolCol()
     # 招生年份
     admission_year = IntCol()
     # 招生季度
-    enrollment_quarter, enrollment_quarter_id = BelongsTo(EnrollmentQuarter, "students", foreign_key=".id")
+    enrollment_quarter, enrollment_quarter_id = BelongsTo(EnrollmentQuarter, "students")
     # (所学)专业(的)代码
     major_code = Str64Col()
     # 培养层次
-    training_level, training_level_id = BelongsTo(TrainingLevel, "students", foreign_key=".id")
+    training_level, training_level_id = BelongsTo(TrainingLevel, "students")
     # 学制
-    education_system, education_system_id = BelongsTo(EducationSystem, "students", foreign_key=".id")
+    education_system, education_system_id = BelongsTo(EducationSystem, "students")
     # 入学时间 YYYY-MM-DD
     admission_time = DateCol()
     # 学生状态
-    student_status, student_status_id = BelongsTo(StudentStatus, "students", foreign_key=".id")
+    student_status, student_status_id = BelongsTo(StudentStatus, "students")
     # 学习形式
-    study_type, study_type_id = BelongsTo(StudyType, "students", foreign_key=".id")
+    study_mode, study_mode_id = BelongsTo(StudyMode, "students")
+    # 家庭联系人姓名
+    family_contact_name = Str64Col()
+    # 家庭联系人电话
+    family_contact_phone = Str64Col()
+    # 家庭地址
+    family_address = Str256Col()
+    # 邮编
+    postal_code = Str32Col()
+    # 兴趣爱好
+    hobby = NullableStr256Col()
+    # 获奖情况
+    award_situation = NullableStr256Col()
+    # 原部队
+    old_army = NullableStr64Col()
+    # 原军衔
+    original_rank, original_rank_id = NullableBelongsTo(OriginalRank, "students")
+    # 入伍地
+    military_base = NullableStr256Col()
+    # 入伍时间
+    enlistment_time = NullableDateCol()
+    # 退伍时间
+    retirement_time = NullableDateCol()
+    # 退役方式
+    retire_type, retire_type_id = NullableBelongsTo(RetireType, "students")
+    # 健康状况
+    health_status, health_status_id = NullableBelongsTo(HealthStatus, "students")
+    # 全国学籍号
+    national_student_id = NullableStr128Col()
+    # 是否广东技校毕业
+    is_guangdong_technical_school_graduation = BoolCol()
+    # 毕业学校
+    graduation_school = Str64Col()
+    # 入学前毕业证号
+    graduation_certificate_number = Str64Col()
+    # 入学前毕业专业
+    graduation_major = NullableStr64Col()
+    # 入学前技能水平
+    graduation_skill_level = NullableStr64Col()
+    # 文科综合分
+    comprehensive_score = NullableFloatCol()
+    # 理科综合分
+    science_score = NullableFloatCol()
+    # 家庭年总收入（元） 源文档没详细说明，权且当成是整数罢
+    family_annual_income = IntCol()
+    # 家庭人均收入（元）
+    family_per_capita_income = IntCol()
+    # 家庭经济来源
+    family_income_source = Str64Col()
+    # 是否10万以下民族
+    is_ethnic_minority_below_100k = BoolCol()
+    # 是否低保
+    is_low_income = BoolCol()
+    # 资助申请类型
+    financial_aid_type, financial_aid_type_id = BelongsTo(FinancialAidType, "students")
+    # 是否建档立卡
+    is_poor_households = BoolCol()
+    # 父亲姓名
+    father_name = Str128Col()
+    # 父亲身份证件类别
+    father_certificate_type_id = ForeignKeyCol(CertificateType)
+    # 父亲身份证号
+    father_certificate_number = Str64Col()
+    # 母亲姓名
+    mother_name = Str128Col()
+    # 母亲身份证件类别
+    mother_certificate_type_id = ForeignKeyCol(CertificateType)
+    # 母亲身份证号
+    mother_certificate_number = Str64Col()
+    # 其他监护人证件类型
+    guardian_certificate_type_id = ForeignKeyCol(CertificateType)
+    # 其他监护人身份证号
+    guardian_certificate_number = Str64Col()
+    # 其他监护人姓名
+    guardian_name = Str128Col()
+    # 其他监护人联系方式
+    guardian_contact = Str64Col()
+    # 备注1-5
+    remark1 = NullableStr128Col()
+    remark2 = NullableStr128Col()
+    remark3 = NullableStr128Col()
+    remark4 = NullableStr128Col()
+    remark5 = NullableStr128Col()
+    # todo repeated field
+    # 国系统学籍号
+    # national_student_id = Str64Col()
+    # 国籍
+    nationality, nationality_id = BelongsTo(Nationality, "students")
+    # 是否家庭困难
+    is_family_difficulty = BoolCol()
+    # 家庭困难类型
+    family_difficulty_type, family_difficulty_type_id = BelongsTo(FamilyDifficultyType, "students")
+    # 社保卡号
+    social_security_card_number = NullableStr64Col()
+    # 缴费金额
+    payment_amount = NullableFloatCol()
+    # 缴费收款收据单号
+    payment_receipt_number = NullableStr64Col()
