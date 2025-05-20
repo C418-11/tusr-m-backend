@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
 from sqlalchemy import Table
+from sqlalchemy import UniqueConstraint
 
 from ..extensions import db
 
@@ -22,10 +26,10 @@ def SecondaryTable(name: str, **col2fk: str) -> Table:
     return db.Table(
         name,
         *(
-            db.Column(cname, db.Integer, db.ForeignKey(fk))
+            Column(cname, Integer, ForeignKey(fk))
             for cname, fk in col2fk.items()
         ),
-        db.UniqueConstraint(
+        UniqueConstraint(
             *col2fk.keys(),  # 所有列名作为联合唯一键
             name=f"uq_{name}_columns"
         ),

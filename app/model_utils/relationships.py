@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from flask_sqlalchemy.model import Model
-from sqlalchemy import Column
 from sqlalchemy import Table
 from sqlalchemy.orm import RelationshipProperty
 
@@ -50,7 +49,7 @@ class RelationshipWithFK:
     """
     关系属性
     """
-    foreign_key: Column[int]
+    foreign_key: ForeignKeyCol
     """
     外键列
     """

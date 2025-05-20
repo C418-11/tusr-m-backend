@@ -26,8 +26,11 @@ from .relationships import DynamicMany
 from .relationships import DynamicMany2Many
 from .relationships import NullableBelongsTo
 from .tables import SecondaryTable
+from .utils import BaseModel
 
 __all__ = (
+    "BaseModel",
+
     "IdCol",
     "ForeignKeyCol",
     "NullableForeignKeyCol",

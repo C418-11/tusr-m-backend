@@ -10,13 +10,13 @@ from typing import cast
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
+from ..model_utils import BaseModel
 from ..model_utils import BoolCol
 from ..model_utils import DynamicMany2Many
 from ..model_utils import IdCol
 from ..model_utils import SecondaryTable
 from ..model_utils import Str128Col
 from ..model_utils import UniqueStr64Col
-from ..extensions import db
 
 # 用户-角色关联表（多对多）
 user_roles = SecondaryTable(
@@ -33,7 +33,7 @@ role_permissions = SecondaryTable(
 )
 
 
-class User(db.Model):  # type: ignore[misc, name-defined]
+class User(BaseModel):
     """
     用户模型
     """
@@ -114,7 +114,7 @@ class User(db.Model):  # type: ignore[misc, name-defined]
         return any(role.has_permission(permission_name) for role in cast(Iterable[Role], self.roles))
 
 
-class Role(db.Model):  # type: ignore[misc, name-defined]
+class Role(BaseModel):
     """
     角色模型
     """
@@ -165,7 +165,7 @@ class Role(db.Model):  # type: ignore[misc, name-defined]
         return any(permission.name == permission_name for permission in cast(Iterable[Permission], self.permissions))
 
 
-class Permission(db.Model):  # type: ignore[misc, name-defined]
+class Permission(BaseModel):
     """
     权限模型
     """

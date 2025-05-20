@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-from ..extensions import db
+from ..model_utils import BaseModel
 from ..model_utils import BelongsTo
 from ..model_utils import BoolCol
 from ..model_utils import DateCol
 from ..model_utils import DynamicMany
+from ..model_utils import ForeignKeyCol
 from ..model_utils import IdCol
 from ..model_utils import IntCol
 from ..model_utils import NullableBelongsTo
@@ -20,10 +21,9 @@ from ..model_utils import Str256Col
 from ..model_utils import Str32Col
 from ..model_utils import Str64Col
 from ..model_utils import UniqueStr64Col
-from ..model_utils import ForeignKeyCol
 
 
-class SchoolClass(db.Model):  # type: ignore[misc, name-defined]
+class SchoolClass(BaseModel):  # type: ignore[misc, name-defined]
     """
     班级
     """
@@ -36,7 +36,7 @@ class SchoolClass(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "school_class")
 
 
-class Gender(db.Model):  # type: ignore[misc, name-defined]
+class Gender(BaseModel):  # type: ignore[misc, name-defined]
     """
     性别
     """
@@ -49,7 +49,7 @@ class Gender(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "gender")
 
 
-class CertificateType(db.Model):  # type: ignore[misc, name-defined]
+class CertificateType(BaseModel):  # type: ignore[misc, name-defined]
     """
     证件类型
     """
@@ -60,7 +60,7 @@ class CertificateType(db.Model):  # type: ignore[misc, name-defined]
     name = UniqueStr64Col()
 
 
-class EthnicGroup(db.Model):  # type: ignore[misc, name-defined]
+class EthnicGroup(BaseModel):  # type: ignore[misc, name-defined]
     """
     民族
     """
@@ -73,7 +73,7 @@ class EthnicGroup(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "ethnic_group")
 
 
-class PreviousEducationLevel(db.Model):  # type: ignore[misc, name-defined]
+class PreviousEducationLevel(BaseModel):  # type: ignore[misc, name-defined]
     """
     以前学历
     """
@@ -86,7 +86,7 @@ class PreviousEducationLevel(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "previous_education_level")
 
 
-class StudentOrigin(db.Model):  # type: ignore[misc, name-defined]
+class StudentOrigin(BaseModel):  # type: ignore[misc, name-defined]
     # noinspection GrazieInspection
     """
     生源地
@@ -100,7 +100,7 @@ class StudentOrigin(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "student_origin")
 
 
-class StudentCategory(db.Model):  # type: ignore[misc, name-defined]
+class StudentCategory(BaseModel):  # type: ignore[misc, name-defined]
     """
     学生类别
     """
@@ -113,7 +113,7 @@ class StudentCategory(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "student_category")
 
 
-class PoliticalStatus(db.Model):  # type: ignore[misc, name-defined]
+class PoliticalStatus(BaseModel):  # type: ignore[misc, name-defined]
     """
     政治面貌
     """
@@ -128,7 +128,7 @@ class PoliticalStatus(db.Model):  # type: ignore[misc, name-defined]
 
 # 户口性质
 # 11.农村 12.县镇 21.城市 30.港澳台 40.外国籍
-class HouseholdType(db.Model):  # type: ignore[misc, name-defined]
+class HouseholdType(BaseModel):  # type: ignore[misc, name-defined]
     """
     户口性质
     """
@@ -143,7 +143,7 @@ class HouseholdType(db.Model):  # type: ignore[misc, name-defined]
 
 # 户口区域
 # 11.本市 12.非本市 21.省外 22.港澳台 30.国外
-class HouseholdArea(db.Model):  # type: ignore[misc, name-defined]
+class HouseholdArea(BaseModel):  # type: ignore[misc, name-defined]
     """
     户口区域
     """
@@ -156,7 +156,7 @@ class HouseholdArea(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "household_area")
 
 
-class HouseholdProvince(db.Model):  # type: ignore[misc, name-defined]
+class HouseholdProvince(BaseModel):  # type: ignore[misc, name-defined]
     """
     户籍所在地-省
     """
@@ -171,7 +171,7 @@ class HouseholdProvince(db.Model):  # type: ignore[misc, name-defined]
     household_cities = DynamicMany("HouseholdCity", "household_province")
 
 
-class HouseholdCity(db.Model):  # type: ignore[misc, name-defined]
+class HouseholdCity(BaseModel):  # type: ignore[misc, name-defined]
     """
     户籍所在地-市
     """
@@ -188,7 +188,7 @@ class HouseholdCity(db.Model):  # type: ignore[misc, name-defined]
     household_counties = DynamicMany("HouseholdCounty", "household_city")
 
 
-class HouseholdCounty(db.Model):  # type: ignore[misc, name-defined]
+class HouseholdCounty(BaseModel):  # type: ignore[misc, name-defined]
     """
     户籍所在地-县
     """
@@ -203,7 +203,7 @@ class HouseholdCounty(db.Model):  # type: ignore[misc, name-defined]
     household_city, household_city_id = BelongsTo(HouseholdCity, "household_counties")
 
 
-class EnrollmentQuarter(db.Model):  # type: ignore[misc, name-defined]
+class EnrollmentQuarter(BaseModel):  # type: ignore[misc, name-defined]
     """
     招生季度
     """
@@ -216,7 +216,7 @@ class EnrollmentQuarter(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "enrollment_quarter")
 
 
-class TrainingLevel(db.Model):  # type: ignore[misc, name-defined]
+class TrainingLevel(BaseModel):  # type: ignore[misc, name-defined]
     """
     培养层次
     """
@@ -229,7 +229,7 @@ class TrainingLevel(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "training_level")
 
 
-class EducationSystem(db.Model):  # type: ignore[misc, name-defined]
+class EducationSystem(BaseModel):  # type: ignore[misc, name-defined]
     """
     学制
     """
@@ -242,7 +242,7 @@ class EducationSystem(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "education_system")
 
 
-class StudentStatus(db.Model):  # type: ignore[misc, name-defined]
+class StudentStatus(BaseModel):  # type: ignore[misc, name-defined]
     """
     学生状态
     """
@@ -255,7 +255,7 @@ class StudentStatus(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "student_status")
 
 
-class StudyMode(db.Model):  # type: ignore[misc, name-defined]
+class StudyMode(BaseModel):  # type: ignore[misc, name-defined]
     """
     学习形式
     """
@@ -268,7 +268,7 @@ class StudyMode(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "study_mode")
 
 
-class OriginalRank(db.Model):  # type: ignore[misc, name-defined]
+class OriginalRank(BaseModel):  # type: ignore[misc, name-defined]
     """
     原军衔
     """
@@ -281,7 +281,7 @@ class OriginalRank(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "original_rank")
 
 
-class RetireType(db.Model):  # type: ignore[misc, name-defined]
+class RetireType(BaseModel):  # type: ignore[misc, name-defined]
     """
     退役方式
     """
@@ -294,7 +294,7 @@ class RetireType(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "retire_type")
 
 
-class HealthStatus(db.Model):  # type: ignore[misc, name-defined]
+class HealthStatus(BaseModel):  # type: ignore[misc, name-defined]
     """
     健康状况
     """
@@ -307,7 +307,7 @@ class HealthStatus(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "health_status")
 
 
-class FinancialAidType(db.Model):  # type: ignore[misc, name-defined]
+class FinancialAidType(BaseModel):  # type: ignore[misc, name-defined]
     """
     资助申请类型
     """
@@ -320,7 +320,7 @@ class FinancialAidType(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "financial_aid_type")
 
 
-class Nationality(db.Model):  # type: ignore[misc, name-defined]
+class Nationality(BaseModel):  # type: ignore[misc, name-defined]
     """
     国籍
     """
@@ -333,7 +333,7 @@ class Nationality(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "nationality")
 
 
-class FamilyDifficultyType(db.Model):  # type: ignore[misc, name-defined]
+class FamilyDifficultyType(BaseModel):  # type: ignore[misc, name-defined]
     """
     家庭困难类型
     """
@@ -346,7 +346,7 @@ class FamilyDifficultyType(db.Model):  # type: ignore[misc, name-defined]
     students = DynamicMany("Student", "family_difficulty_type")
 
 
-class Student(db.Model):  # type: ignore[misc, name-defined]
+class Student(BaseModel):  # type: ignore[misc, name-defined]
     """
     学生信息
     """

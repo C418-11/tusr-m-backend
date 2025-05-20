@@ -5,38 +5,22 @@ from sqlalchemy import Column
 from sqlalchemy import Float
 from sqlalchemy import Integer
 
-
-# noinspection PyPep8Naming
-def IntCol() -> Column[int]:
-    """
-    创建整数列
-
-    :return: 整数列对象
-    :rtype: Column[Integer]
-    """
-    return Column(Integer)
+from ..utils import ColumnDescriptor
 
 
-# noinspection PyPep8Naming
-def FloatCol() -> Column[float]:
-    """
-    创建浮点数列
+class IntCol(ColumnDescriptor[Column[int]]):
+    def create_column(self):
+        return Column(Integer, **self.kwargs)
 
-    :return: 浮点数列对象
-    :rtype: Column[float]
-    """
-    return Column(Float)
+
+class FloatCol(ColumnDescriptor[Column[float]]):
+    def create_column(self):
+        return Column(Float, **self.kwargs)
 
 
 # noinspection PyPep8Naming
-def NullableFloatCol() -> Column[float]:
-    """
-    创建可为空的浮点数列
-
-    :return: 可为空的浮点数列对象
-    :rtype: Column[float]
-    """
-    return Column(Float, nullable=True)
+def NullableFloatCol(**kwargs) -> FloatCol:
+    return FloatCol(**kwargs)
 
 
 __all__ = (

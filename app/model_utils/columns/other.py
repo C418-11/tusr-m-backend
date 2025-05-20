@@ -1,55 +1,33 @@
 # -*- coding: utf-8 -*-
 
 
-from typing import Any
-from typing import overload
-
 from flask_sqlalchemy.model import Model
-from sqlalchemy import Column, ForeignKey
+from sqlalchemy import Column
+from sqlalchemy import ForeignKey
 from sqlalchemy import Integer
 
-
-# noinspection PyPep8Naming
-def IdCol() -> Column[int]:
-    """
-    创建主键ID列
-
-    :return: 整数类型的主键列
-    :rtype: Column[Integer]
-    """
-    return Column(Integer, primary_key=True)
+from ..utils import ColumnDescriptor
 
 
-# noinspection PyPep8Naming
-@overload  # type: ignore[misc]
-def ForeignKeyCol(foreign_key: str | type[Model], *, nullable: bool = False) -> Column[int]:
-    # noinspection SpellCheckingInspection
-    """
-    创建外键列
+class IdCol(ColumnDescriptor[Column[int]]):
+    def create_column(self):
+        return Column(Integer, primary_key=True, **self.kwargs)
 
-    .. hint::
-       当传入的 ``foreign_key`` 为模型时，会自动处理为 ``model.__tablename__ + ".id"``
 
-    :param foreign_key: 外键列关联的列名
-    :type foreign_key: str | type[Model]
-    :param nullable: 是否允许为空
-    :type nullable: bool
+class ForeignKeyCol(ColumnDescriptor[Column[int]]):
+    def __init__(self, foreign_key: str | type[Model], **kwargs) -> None:
+        if not isinstance(foreign_key, str):
+            # noinspection SpellCheckingInspection
+            foreign_key = f"{getattr(foreign_key, "__tablename__")}.id"
+        self.foreign_key = foreign_key
+        super().__init__(**kwargs)
 
-    :return: 外键列对象
-    :rtype: Column[Integer]
-    """
+    def create_column(self):
+        return Column(Integer, ForeignKey(self.foreign_key), **self.kwargs)
 
 
 # noinspection PyPep8Naming
-def ForeignKeyCol(foreign_key: str | type[Model], **kwargs: Any) -> Column[int]:
-    if not isinstance(foreign_key, str):
-        # noinspection SpellCheckingInspection
-        foreign_key = f"{getattr(foreign_key, "__tablename__")}.id"
-    return Column(Integer, ForeignKey(foreign_key), **kwargs)
-
-
-# noinspection PyPep8Naming
-def NullableForeignKeyCol(foreign_key: str | type[Model]) -> Column[int]:
+def NullableForeignKeyCol(foreign_key: str | type[Model]) -> ForeignKeyCol:
     return ForeignKeyCol(foreign_key, nullable=True)
 
 
