@@ -265,7 +265,7 @@ def initialize_hooks(app: Flask) -> None:
     @jwt.expired_token_loader
     @jwt.unauthorized_loader
     @api
-    def unauthorized_callback(*_: Any) -> APIResult:
+    def unauthorized_callback(*_: Any) -> Unauthorized:
         return Unauthorized()
 
     @app.errorhandler(HTTPException)

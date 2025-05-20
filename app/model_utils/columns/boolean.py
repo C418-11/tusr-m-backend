@@ -10,7 +10,7 @@ from ..utils import ColumnDescriptor
 
 
 class BoolCol(ColumnDescriptor[Column[bool]]):
-    def create_column(self):
+    def create_column(self) -> Column[bool]:
         return Column(Boolean, **self.kwargs)
 
 

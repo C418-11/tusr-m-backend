@@ -24,8 +24,11 @@ class ColumnInfo:
 
 
 class ColumnDescriptor[C: Column[Any]](ABC):
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.kwargs = kwargs
+
+    def __get__(self, instance: Any, owner: Any) -> C:
+        raise AttributeError("This attribute is not accessible")
 
     @abstractmethod
     def create_column(self) -> C:
@@ -46,21 +49,21 @@ class BaseModel(db.Model):  # type: ignore[misc, name-defined]
 
             primary_key=column.primary_key,
             unique=bool(column.unique),
-            nullable=column.nullable,
+            nullable=bool(column.nullable),
             default=column.default.arg if isinstance(column.default, ScalarElementColumnDefault) else None,
 
             length=getattr(descriptor, "length", None),
         )
 
     @classmethod
-    def get_columns_info(cls):
+    def get_columns_info(cls) -> dict[str, ColumnInfo] | dict[str, dict[str, ColumnInfo]]:
         """获取字段信息"""
         # noinspection SpellCheckingInspection
         if not hasattr(cls, "__tablename__"):
             return cls._columns_registry
         return cls._columns_registry[cls.__tablename__]
 
-    def __init_subclass__(cls, **kwargs):
+    def __init_subclass__(cls, **kwargs: Any) -> None:
         # 遍历子类属性，将字段信息注册到类级别字段注册表中
         for name, attr in cls.__dict__.items():
             if isinstance(attr, ColumnDescriptor):

@@ -112,7 +112,7 @@ class AccountsFilterSchema(Schema):
 @jwt_required()  # type: ignore[misc]
 @api
 @permissions_required([PERMISSIONS.ACCOUNT.LIST, PERMISSIONS.ACCOUNT.GET])
-def get_accounts() -> APIResult:
+def get_accounts() -> GetAccounts:
     """
     获取账户列表
 
@@ -142,7 +142,7 @@ def get_accounts() -> APIResult:
 @jwt_required()  # type: ignore[misc]
 @api
 @permissions_required([PERMISSIONS.ACCOUNT.GET])
-def get_account(account_id: int) -> APIResult:
+def get_account(account_id: int) -> GetAccounts | AccountNotFound:
     """
     获取账户
 

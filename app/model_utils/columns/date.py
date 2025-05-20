@@ -11,7 +11,7 @@ from ..utils import ColumnDescriptor
 
 
 class DateCol(ColumnDescriptor[Column[date]]):
-    def create_column(self):
+    def create_column(self) -> Column[date]:
         return Column(Date, **self.kwargs)
 
 

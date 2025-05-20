@@ -10,11 +10,11 @@ from app.model_utils.utils import ColumnDescriptor
 
 
 class StrCol(ColumnDescriptor[Column[str]]):
-    def __init__(self, length: int, **kwargs):
+    def __init__(self, length: int, **kwargs: Any):
         self.length = length
         super().__init__(**kwargs)
 
-    def create_column(self):
+    def create_column(self) -> Column[str]:
         if self.length <= 0:
             raise ValueError(f"length must be positive, got {self.length}")
         return Column(String(self.length), **self.kwargs)

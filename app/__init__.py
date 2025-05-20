@@ -8,7 +8,6 @@ from . import api
 from .config import Config
 from .extensions import db
 from .extensions import jwt
-from .model_utils import BaseModel
 from .routes import auth
 from .routes import data
 
