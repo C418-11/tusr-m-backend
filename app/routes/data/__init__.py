@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from flask import Flask
 from mypy_extensions import NamedArg
 
-from .bp import bp
+from .routers import bp
 from ...models.data import FamilyDifficultyType
 
 

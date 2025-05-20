@@ -42,7 +42,13 @@ class UserLoginSchema(Schema):
 
 @bp.route("/login", methods=["POST"])
 @api
-def login() -> APIResult:
+def login() -> LoginSuccess | WrongUsernameOrPassword | DisabledAccount:
+    """
+    登录
+
+    :return: 是否成功
+    :rtype: LoginSuccess | WrongUsernameOrPassword | DisabledAccount
+    """
     data = validate_json_arguments(UserLoginSchema)
     user = User.query.filter_by(username=data["username"]).first()
 
@@ -59,7 +65,15 @@ def login() -> APIResult:
 @bp.route("/logout", methods=["POST"])
 @jwt_required()  # type: ignore[misc]
 @api
-def logout() -> APIResult:
+def logout() -> LogoutSuccess:
+    """
+    登出
+
+    需求登录
+
+    :return: 登出信息
+    :rtype: LogoutSuccess
+    """
     jti = get_jwt()["jti"]
     jwt_redis_blocklist.set(jti, "", ex=current_app.config["JWT_ACCESS_TOKEN_EXPIRES"])
     return LogoutSuccess()
@@ -68,7 +82,15 @@ def logout() -> APIResult:
 @bp.route("/whoami", methods=["GET"])
 @jwt_required()  # type: ignore[misc]
 @api
-def whoami() -> APIResult:
+def whoami() -> GetAccounts | Unauthorized:
+    """
+    获取当前用户信息
+
+    需求登录
+
+    :return: 当前用户信息
+    :rtype: GetAccounts | Unauthorized
+    """
     user_id = get_jwt_identity()
     user = User.query.filter_by(id=user_id).first()
     if user is None:
@@ -78,6 +100,9 @@ def whoami() -> APIResult:
 
 
 class AccountsFilterSchema(Schema):
+    """
+    账户列表筛选
+    """
     username = fields.String(allow_none=True)
     active = fields.Boolean(allow_none=True)
     roles = fields.List(fields.String(allow_none=False), allow_none=True)
@@ -86,8 +111,13 @@ class AccountsFilterSchema(Schema):
 @bp.route("/accounts", methods=["GET"])
 @jwt_required()  # type: ignore[misc]
 @api
-@permissions_required([PERMISSIONS.ACCOUNT.GET])
+@permissions_required([PERMISSIONS.ACCOUNT.LIST, PERMISSIONS.ACCOUNT.GET])
 def get_accounts() -> APIResult:
+    """
+    获取账户列表
+
+    需求登录， :py:attr:`PERMISSIONS.ACCOUNT.LIST` & :py:attr:`PERMISSIONS.ACCOUNT.GET`
+    """
     data = validate_json_arguments(AccountsFilterSchema, optional=True)
 
     accounts: list[User]
@@ -113,6 +143,16 @@ def get_accounts() -> APIResult:
 @api
 @permissions_required([PERMISSIONS.ACCOUNT.GET])
 def get_account(account_id: int) -> APIResult:
+    """
+    获取账户
+
+    复用 :py:class:`GetAccounts` 返回
+
+    需求登录， :py:attr:`PERMISSIONS.ACCOUNT.GET`
+
+    :param account_id: 账户 ID
+    :type account_id: int
+    """
     account = User.query.filter_by(id=account_id).first()
     if account is None:
         return AccountNotFound()
@@ -122,6 +162,9 @@ def get_account(account_id: int) -> APIResult:
 
 
 class UserCreateSchema(Schema):
+    """
+    创建用户请求
+    """
     username = fields.String(required=True, allow_none=False)
     password = fields.String(required=True, allow_none=False)
 
@@ -130,6 +173,14 @@ class UserCreateSchema(Schema):
 
 
 def validation_username(username: str) -> None:
+    """
+    验证用户名
+
+    :param username: 用户名
+    :type username: str
+
+    :raise APIException: 用户名不符合要求
+    """
     messages: list[str] = []
     if len(username) < 3:
         messages.append("username must be at least 3 characters long")
@@ -143,6 +194,15 @@ def validation_username(username: str) -> None:
 
 
 def validation_password(password: str) -> None:
+    """
+    验证密码
+
+    :param password: 密码
+    :type password: str
+
+    :raise APIException: 密码不符合要求
+    """
+
     messages: list[str] = []
     if len(password) < 6:
         messages.append("password must be at least 6 characters long")
@@ -166,6 +226,11 @@ def validation_password(password: str) -> None:
 @api
 @permissions_required([PERMISSIONS.ACCOUNT.CREATE])
 def create_account() -> APIResult:
+    """
+    创建账户
+
+    需求登录， :py:attr:`PERMISSIONS.ACCOUNT.CREATE`
+    """
     data = validate_json_arguments(UserCreateSchema)
     validation_username(data["username"])
     validation_password(data["password"])
@@ -191,6 +256,9 @@ def create_account() -> APIResult:
 
 
 class UserUpdateSchema(Schema):
+    """
+    更新用户信息
+    """
     username = fields.String(allow_none=True)
     password = fields.String(allow_none=True)
 
@@ -199,6 +267,9 @@ class UserUpdateSchema(Schema):
 
 
 class UserUpdateSelfPasswordSchema(Schema):
+    """
+    更新用户密码
+    """
     password = fields.String(allow_none=False)
 
 
@@ -207,6 +278,14 @@ class UserUpdateSelfPasswordSchema(Schema):
 @api
 @permissions_required([PERMISSIONS.ACCOUNT.UPDATE, PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD, ], strategy=any)
 def update_account(account_id: int) -> APIResult:
+    """
+    更新用户信息
+
+    需求登录， :py:attr:`PERMISSIONS.ACCOUNT.UPDATE` | :py:attr:`PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD`
+
+    :param account_id: 用户ID
+    :return: 用户信息
+    """
     user: User | None = User.query.filter_by(id=account_id).first()
 
     if user is None:
@@ -246,6 +325,13 @@ def update_account(account_id: int) -> APIResult:
 @api
 @permissions_required([PERMISSIONS.ACCOUNT.DELETE])
 def delete_account(account_id: int) -> APIResult:
+    """
+    删除账户
+
+    需求登录， :py:attr:`PERMISSIONS.ACCOUNT.DELETE`
+
+    :param account_id: 用户ID
+    """
     user = User.query.filter_by(id=account_id).first()
     if user is None:
         return AccountNotFound()

@@ -15,15 +15,18 @@
 
 1. API接口相关
 2. 身份验证相关
+3. 数据表相关
 """
 
 import dataclasses
 from dataclasses import dataclass
 from dataclasses import field
 from http import HTTPStatus
-from typing import Any, Optional, overload
+from typing import Any
 from typing import Callable
+from typing import Optional
 from typing import cast
+from typing import overload
 from typing import override
 
 from flask import Flask
@@ -35,6 +38,7 @@ from werkzeug.exceptions import HTTPException
 from wrapt import decorator  # type: ignore[import-untyped]
 
 from .extensions import jwt
+from .model_utils.utils import ColumnInfo
 
 
 @dataclass(kw_only=True)
@@ -147,6 +151,13 @@ class GetPermissions(APIResult):
     code: int = d(521)
     message: str = d("Get Permissions Success")
     permissions: list[dict[str, Any]]
+
+
+@dataclass(kw_only=True)
+class GetTables(APIResult):
+    code: int = d(131)
+    message: str = d("Get Tables Success")
+    tables: dict[str, dict[str, ColumnInfo]]
 
 
 @register
@@ -274,11 +285,14 @@ __all__ = (
     "HTTP_2_API",
 
     "RequestSuccess",
+
     "LoginSuccess",
     "LogoutSuccess",
     "GetAccounts",
     "GetRoles",
     "GetPermissions",
+
+    "GetTables",
 
     "APINotFound",
     "WrongMethod",

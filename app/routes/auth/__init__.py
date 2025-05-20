@@ -83,6 +83,7 @@ def initialize_setup() -> None:
     for name, desc in {
         PERMISSIONS.ACCOUNT.CREATE: "创建账户",
         PERMISSIONS.ACCOUNT.GET: "获取账户",
+        PERMISSIONS.ACCOUNT.LIST: "获取账户列表",
         PERMISSIONS.ACCOUNT.UPDATE: "更新账户信息",
         PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD: "更新自身密码",
         PERMISSIONS.ACCOUNT.DELETE: "删除账户",
@@ -90,6 +91,7 @@ def initialize_setup() -> None:
         PERMISSIONS.ROLE.CREATE: "创建角色",
         PERMISSIONS.ROLE.DELETE: "删除角色",
         PERMISSIONS.PERMISSION.GET: "获取权限",
+        PERMISSIONS.TABLE.LIST: "获取数据表列表",
     }.items():
         print(f"创建权限：{name}")
         # noinspection SpellCheckingInspection
@@ -102,6 +104,7 @@ def initialize_setup() -> None:
     for name, (desc, permissions) in {
         "admin": ("管理员", [
             PERMISSIONS.ACCOUNT.GET,
+            PERMISSIONS.ACCOUNT.LIST,
             PERMISSIONS.ACCOUNT.CREATE,
             PERMISSIONS.ACCOUNT.DELETE,
             PERMISSIONS.ACCOUNT.UPDATE,
@@ -110,6 +113,7 @@ def initialize_setup() -> None:
             PERMISSIONS.ROLE.CREATE,
             PERMISSIONS.ROLE.DELETE,
             PERMISSIONS.PERMISSION.GET,
+            PERMISSIONS.TABLE.LIST,
         ]),
         "user": ("用户", [
             PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD,

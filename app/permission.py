@@ -29,9 +29,13 @@ class PERMISSIONS:
     class ACCOUNT(StrEnum):
         CREATE = "auth/accounts/create"
         GET = "auth/accounts/get"
+        LIST = "auth/accounts/list"
         DELETE = "auth/accounts/delete"
         UPDATE = "auth/accounts/update"
         UPDATE_SELF_PASSWORD = "auth/accounts/update/self_password"
+
+    class TABLE(StrEnum):
+        LIST = "data/tables/list"
 
 
 def verify_permissions_in_request(
