@@ -85,13 +85,19 @@ def initialize_setup() -> None:
         PERMISSIONS.ACCOUNT.GET: "获取账户",
         PERMISSIONS.ACCOUNT.LIST: "获取账户列表",
         PERMISSIONS.ACCOUNT.UPDATE: "更新账户信息",
-        PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD: "更新自身密码",
+        PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD: "更新自身密码",  # todo 待实装前端
         PERMISSIONS.ACCOUNT.DELETE: "删除账户",
         PERMISSIONS.ROLE.GET: "获取角色",
         PERMISSIONS.ROLE.CREATE: "创建角色",
         PERMISSIONS.ROLE.DELETE: "删除角色",
         PERMISSIONS.PERMISSION.GET: "获取权限",
+        PERMISSIONS.TABLE.GET: "获取数据表",
         PERMISSIONS.TABLE.LIST: "获取数据表列表",
+        PERMISSIONS.DATA.GET: "获取数据",
+        PERMISSIONS.DATA.LIST: "获取数据列表",
+        PERMISSIONS.DATA.CREATE: "创建数据",
+        PERMISSIONS.DATA.UPDATE: "更新数据",
+        PERMISSIONS.DATA.DELETE: "删除数据",
     }.items():
         print(f"创建权限：{name}")
         # noinspection SpellCheckingInspection
@@ -113,7 +119,13 @@ def initialize_setup() -> None:
             PERMISSIONS.ROLE.CREATE,
             PERMISSIONS.ROLE.DELETE,
             PERMISSIONS.PERMISSION.GET,
+            PERMISSIONS.TABLE.GET,
             PERMISSIONS.TABLE.LIST,
+            PERMISSIONS.DATA.GET,
+            PERMISSIONS.DATA.LIST,
+            PERMISSIONS.DATA.CREATE,
+            PERMISSIONS.DATA.UPDATE,
+            PERMISSIONS.DATA.DELETE,
         ]),
         "user": ("用户", [
             PERMISSIONS.ACCOUNT.UPDATE_SELF_PASSWORD,

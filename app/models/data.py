@@ -29,6 +29,7 @@ class SchoolClass(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "classes"
+    __editable__ = True
     id = IdCol()
     # 班级名称
     name = UniqueStr64Col()
@@ -42,6 +43,7 @@ class Gender(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "genders"
+    __editable__ = False
     id = IdCol()
     # 性别
     name = UniqueStr64Col()
@@ -55,6 +57,7 @@ class CertificateType(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "certificate_types"
+    __editable__ = False
     id = IdCol()
     # 证件类型
     name = UniqueStr64Col()
@@ -66,6 +69,7 @@ class EthnicGroup(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "ethnic_groups"
+    __editable__ = False
     id = IdCol()
     # 民族
     name = UniqueStr64Col()
@@ -79,6 +83,7 @@ class PreviousEducationLevel(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "previous_education_levels"
+    __editable__ = False
     id = IdCol()
     # 学历
     name = UniqueStr64Col()
@@ -93,6 +98,7 @@ class StudentOrigin(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "student_origins"
+    __editable__ = False
     id = IdCol()
     # 生源地
     name = UniqueStr64Col()
@@ -106,6 +112,7 @@ class StudentCategory(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "student_categories"
+    __editable__ = False
     id = IdCol()
     # 学生类别
     name = UniqueStr64Col()
@@ -119,6 +126,7 @@ class PoliticalStatus(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "political_statuses"
+    __editable__ = False
     id = IdCol()
     # 政治面貌
     name = UniqueStr64Col()
@@ -126,14 +134,13 @@ class PoliticalStatus(BaseModel):
     students = DynamicMany("Student", "political_status")
 
 
-# 户口性质
-# 11.农村 12.县镇 21.城市 30.港澳台 40.外国籍
 class HouseholdType(BaseModel):
     """
     户口性质
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "household_types"
+    __editable__ = False
     id = IdCol()
     # 户口性质
     name = UniqueStr64Col()
@@ -141,14 +148,13 @@ class HouseholdType(BaseModel):
     students = DynamicMany("Student", "household_type")
 
 
-# 户口区域
-# 11.本市 12.非本市 21.省外 22.港澳台 30.国外
 class HouseholdArea(BaseModel):
     """
     户口区域
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "household_areas"
+    __editable__ = False
     id = IdCol()
     # 户口区域
     name = UniqueStr64Col()
@@ -162,6 +168,7 @@ class HouseholdProvince(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "household_provinces"
+    __editable__ = True
     id = IdCol()
     # 户籍所在地-省
     name = UniqueStr64Col()
@@ -177,6 +184,7 @@ class HouseholdCity(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "household_cities"
+    __editable__ = True
     id = IdCol()
     # 户籍所在地-市
     name = UniqueStr64Col()
@@ -194,6 +202,7 @@ class HouseholdCounty(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "household_counties"
+    __editable__ = True
     id = IdCol()
     # 户籍所在地-县
     name = UniqueStr64Col()
@@ -209,6 +218,7 @@ class EnrollmentQuarter(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "enrollment_quarters"
+    __editable__ = False
     id = IdCol()
     # 招生季度
     name = UniqueStr64Col()
@@ -222,6 +232,7 @@ class TrainingLevel(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "training_levels"
+    __editable__ = False
     id = IdCol()
     # 培养层次
     name = UniqueStr64Col()
@@ -235,6 +246,7 @@ class EducationSystem(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "education_systems"
+    __editable__ = False
     id = IdCol()
     # 学制
     name = UniqueStr64Col()
@@ -248,6 +260,7 @@ class StudentStatus(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "student_statuses"
+    __editable__ = False
     id = IdCol()
     # 学生状态
     name = UniqueStr64Col()
@@ -261,6 +274,7 @@ class StudyMode(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "study_modes"
+    __editable__ = False
     id = IdCol()
     # 学习形式
     name = UniqueStr64Col()
@@ -274,6 +288,7 @@ class OriginalRank(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "original_ranks"
+    __editable__ = False
     id = IdCol()
     # 原军衔
     name = UniqueStr64Col()
@@ -287,6 +302,7 @@ class RetireType(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "retire_types"
+    __editable__ = False
     id = IdCol()
     # 退役方式
     name = UniqueStr64Col()
@@ -300,6 +316,7 @@ class HealthStatus(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "health_statuses"
+    __editable__ = False
     id = IdCol()
     # 健康状况
     name = UniqueStr64Col()
@@ -313,6 +330,7 @@ class FinancialAidType(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "financial_aid_types"
+    __editable__ = False
     id = IdCol()
     # 资助申请类型
     name = UniqueStr64Col()
@@ -326,6 +344,7 @@ class Nationality(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "nationalities"
+    __editable__ = False
     id = IdCol()
     # 国籍
     name = UniqueStr64Col()
@@ -339,6 +358,7 @@ class FamilyDifficultyType(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "family_difficulty_types"
+    __editable__ = False
     id = IdCol()
     # 家庭困难类型
     name = UniqueStr64Col()
@@ -352,6 +372,7 @@ class Student(BaseModel):
     """
     # noinspection SpellCheckingInspection
     __tablename__ = "students"
+    __editable__ = True
     id = IdCol()
     # 办学点名称
     campus_name = Str64Col()
@@ -513,3 +534,33 @@ class Student(BaseModel):
     payment_amount = NullableFloatCol()
     # 缴费收款收据单号
     payment_receipt_number = NullableStr64Col()
+
+
+TABLES = [
+    SchoolClass,
+    Gender,
+    CertificateType,
+    EthnicGroup,
+    PreviousEducationLevel,
+    StudentOrigin,
+    StudentCategory,
+    PoliticalStatus,
+    HouseholdType,
+    HouseholdArea,
+    HouseholdProvince,
+    HouseholdCity,
+    HouseholdCounty,
+    EnrollmentQuarter,
+    TrainingLevel,
+    EducationSystem,
+    StudentStatus,
+    StudyMode,
+    OriginalRank,
+    RetireType,
+    HealthStatus,
+    FinancialAidType,
+    Nationality,
+    FamilyDifficultyType,
+    Student,
+]
+EDITABLE_TABLE_NAMES = [table.__tablename__ for table in TABLES if table.__editable__]

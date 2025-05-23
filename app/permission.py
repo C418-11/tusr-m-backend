@@ -35,7 +35,15 @@ class PERMISSIONS:
         UPDATE_SELF_PASSWORD = "auth/accounts/update/self_password"
 
     class TABLE(StrEnum):
+        GET = "data/tables/get"
         LIST = "data/tables/list"
+
+    class DATA(StrEnum):
+        GET = "data/get"
+        LIST = "data/list"
+        CREATE = "data/create"
+        UPDATE = "data/update"
+        DELETE = "data/delete"
 
 
 def verify_permissions_in_request(

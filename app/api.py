@@ -160,6 +160,13 @@ class GetTables(APIResult):
     tables: dict[str, dict[str, ColumnInfo]]
 
 
+@dataclass(kw_only=True)
+class GetRows(APIResult):
+    code: int = d(131)
+    message: str = d("Get Data Success")
+    rows: list[dict[str, Any]]
+
+
 @register
 @dataclass(kw_only=True)
 class APINotFound(APIResult):
@@ -232,6 +239,13 @@ class DisabledAccount(APIResult):
     message: str = d("Disabled Account")
 
 
+@register
+@dataclass(kw_only=True)
+class DataTableNotFound(APIResult):
+    code: int = d(132)
+    message: str = d("Data Table Not Found")
+
+
 class APIException(Exception):
     def __init__(self, result: APIResult) -> None:
         self.result = result
@@ -293,6 +307,7 @@ __all__ = (
     "GetPermissions",
 
     "GetTables",
+    "GetRows",
 
     "APINotFound",
     "WrongMethod",
@@ -304,6 +319,8 @@ __all__ = (
     "AccountNotFound",
     "WrongUsernameOrPassword",
     "DisabledAccount",
+
+    "DataTableNotFound",
 
     "APIException",
 

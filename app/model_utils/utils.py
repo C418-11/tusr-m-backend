@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from abc import ABC
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Self
+from typing import Any
+from typing import Optional
 
 from sqlalchemy import Column
 from sqlalchemy.sql.schema import ScalarElementColumnDefault
@@ -19,6 +22,7 @@ class ColumnInfo:
     unique: bool
     nullable: bool
     default: Any
+    foreign_key: str | None
 
     length: Optional[int]
 
@@ -40,10 +44,13 @@ class ColumnDescriptor[C: Column[Any]](ABC):
 class BaseModel(db.Model):  # type: ignore[misc, name-defined]
     __abstract__ = True
     _columns_registry: dict[str, dict[str, ColumnInfo]] = {}
+    _name2table: dict[str, type[Self]] = {}
 
     @classmethod
     def register_column[C: Column[Any]](cls, name: str, descriptor: ColumnDescriptor[C], column: C) -> None:
+        assert len(column.foreign_keys) < 2, column.foreign_keys
         # 提取字段信息
+        cls._name2table[cls.__tablename__] = cls
         cls._columns_registry.setdefault(cls.__tablename__, {})[name] = ColumnInfo(
             type=str(column.type),
 
@@ -51,6 +58,7 @@ class BaseModel(db.Model):  # type: ignore[misc, name-defined]
             unique=bool(column.unique),
             nullable=bool(column.nullable),
             default=column.default.arg if isinstance(column.default, ScalarElementColumnDefault) else None,
+            foreign_key=[fk.target_fullname for fk in column.foreign_keys][0] if column.foreign_keys else None,
 
             length=getattr(descriptor, "length", None),
         )
@@ -62,6 +70,18 @@ class BaseModel(db.Model):  # type: ignore[misc, name-defined]
         if not hasattr(cls, "__tablename__"):
             return cls._columns_registry
         return cls._columns_registry[cls.__tablename__]
+
+    @classmethod
+    def name2table(cls, name: Optional[str] = None) -> type[Self] | dict[str, type[Self]]:
+        if name is None:
+            return cls._name2table
+        return cls._name2table[name]
+
+    def to_dict(self) -> dict[str, Any]:
+        dct = {}
+        for name in self.get_columns_info().keys():
+            dct[name] = getattr(self, name)
+        return dct
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         # 遍历子类属性，将字段信息注册到类级别字段注册表中
