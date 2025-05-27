@@ -162,7 +162,7 @@ class GetTables(APIResult):
 
 @dataclass(kw_only=True)
 class GetRows(APIResult):
-    code: int = d(131)
+    code: int = d(231)
     message: str = d("Get Data Success")
     rows: list[dict[str, Any]]
 
